@@ -9,7 +9,7 @@
 }
 
 body {
-    background: #F4F5F7;
+    background: #f2f2f2;
     color: #333;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
     line-height: 1.6;
@@ -38,12 +38,19 @@ body.modal-open {
    ============================================ */
 
 #header {
-    background: #F4F5F7;
-    border-bottom: 1px solid #000000;
-    padding: 1rem 0;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    z-index: 2;
+}
+
+.custom-header {
+    background: #f2f2f2;
     position: sticky;
     top: 0;
     z-index: 100;
+    border-top: 1px solid #cecece;
+    padding: 1rem 0;
 }
 
 .header-content {
@@ -52,30 +59,23 @@ body.modal-open {
     justify-content: space-between;
 }
 
-.logo {
-    color: #000000;
-    font-size: 40px;
-    font-weight: lighter;
-    text-decoration: none;
-}
-
 /* Back Button */
 .back-btn {
     align-items: center;
     background: none;
     border: none;
     border-radius: 50%;
-    color: #333;
+    color: #2b2b2bff;
     cursor: pointer;
     display: flex;
     justify-content: center;
     padding: 0.5rem;
-    transition: color 0.2s, background 0.2s;
+    transition: all 0.2s;
 }
 
 .back-btn:hover {
-    background: #f0f0f0;
-    color: #007bff;
+    background: #2b2b2bff;
+    color: #f2f2f2;
 }
 
 .back-btn svg {
@@ -112,15 +112,14 @@ body.modal-open {
 
 /* Dropdown Menu */
 .dropdown-menu {
-    background: #d9d9d9;
+    background: #ffffff;
     border: 1px solid #ddd;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     min-width: 160px;
     opacity: 0;
-    padding: 0.5rem 0;
     position: absolute;
     right: 0;
-    top: calc(100% + 0.5rem);
+    bottom: calc(100% + 0.5rem);
     transform: translateY(-10px);
     transition: all 0.2s;
     visibility: hidden;
@@ -177,36 +176,45 @@ body.modal-open {
     opacity: 0.6;
 }
 
+.btn:hover{
+
+    transform: translateY(-1px);
+}
+
+/* 똥그라미 버튼 */ 
 .btn-primary {
-    background: #aca0eb;
+    background: #2b2b2b;
     color: white;
+    border-radius: 200px;
+    height: 48px;
+    width: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.btn-primary:hover:not(:disabled) {
-    background: #7f6aee;
-}
-
-.btn-secondary {
-    background: #6c757d;
+/* new 가로 긴 둥글 버튼 게시글 쓰러가기 버튼*/ 
+.btn-post {
+    background: #2b2b2bff;
     color: white;
+    font-size: 18px;
 }
 
-.btn-danger {
-    background: #dc3545;
-    color: white;
+.btn-post:hover {
+    background: #202020;
 }
 
+/* 수정 삭제 */ 
 .btn-form {
-    background: transparent;
-    border: 1px solid #ACA0EB;
-    border-radius: 10px;
-    color: black;
+    background: #2b2b2bff;
+    border-radius: 20px;
+    color: white;
     padding: 5px 10px;
 }
 
-/* Basic Button (for auth forms) */
+/* 네모 직각 (로그인 회원가입) */
 .btn-basic {
-    background: #aca0eb;
+    background: #2b2b2bff;
     border: none;
     border-radius: 4px;
     color: white;
@@ -215,22 +223,19 @@ body.modal-open {
     font-size: 1rem;
     font-weight: 500;
     padding: 0.75rem 1.5rem;
-    transition: all 0.3s ease;
 }
 
 .btn-basic.active {
-    background: #7f6aee;
+    background: #2b2b2bff;
     cursor: pointer;
 }
 
 .btn-basic.active:hover {
-    background: #6d5ad4;
-    box-shadow: 0 4px 8px rgba(127, 106, 238, 0.3);
-    transform: translateY(-1px);
+    background: #202020;
 }
 
 .btn-basic:disabled {
-    background: #aca0eb;
+    background: #72706D;
     cursor: not-allowed;
     opacity: 1;
 }
@@ -352,7 +357,7 @@ body.modal-open {
 
 .card {
     background: white;
-    border-radius: 8px;
+    border-radius: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     margin-bottom: 1rem;
     padding: 1.5rem;
@@ -366,7 +371,6 @@ body.modal-open {
 }
 
 .post-card:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     transform: translateY(-2px);
 }
 
@@ -382,8 +386,23 @@ body.modal-open {
 }
 
 /* Comment Card */
-.comment-card {
+.round-card {
     padding: 0;
+    background: white;
+    border-radius: 100px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    padding: 20px;
+}
+
+/* PostDetail Card */
+.non-post-card{
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+    padding: 1.5rem;
+    padding: 30px;
 }
 
 /* ============================================
@@ -538,12 +557,12 @@ body.modal-open {
 }
 
 .modal-btn-confirm {
-    background: #7f6aee;
+    background: #580202;
     color: white;
 }
 
 .modal-btn-confirm:hover {
-    background: #6d5ad4;
+    background: #400303;
 }
 
 /* ============================================
@@ -551,7 +570,7 @@ body.modal-open {
    ============================================ */
 
 .toast {
-    background: #ACA0EB;
+    background: #2b2b2b;
     border-radius: 30px;
     bottom: 30px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -722,4 +741,44 @@ body.modal-open {
         font-size: 0.9rem;
         padding: 0.75rem 1.5rem;
     }
+}
+
+.heart{
+    background-image: url("https://s2.svgbox.net/octicons.svg?ic=heart-bold");
+    background-repeat: no-repeat;
+    background-position: center left;
+    background-size: contain;
+    width: 15px;
+    height: 15px;
+    background-color: transparent;
+}
+
+.heart.liked{
+    background-image: url("https://s2.svgbox.net/octicons.svg?ic=heart-fill-bold");
+    background-repeat: no-repeat;
+    background-position: center left;
+    background-size: contain;
+    width: 15px;
+    height: 15px;
+    background-color: transparent;
+}
+
+.view{
+    background-image: url("https://s2.svgbox.net/hero-outline.svg?ic=eye");
+    background-repeat: no-repeat;
+    background-position: center left;
+    background-size: contain;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+}
+
+.comment{
+    background-image: url("https://s2.svgbox.net/hero-outline.svg?ic=chat");
+    background-repeat: no-repeat;
+    background-position: center left;
+    background-size: contain;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
 }

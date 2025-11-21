@@ -1,7 +1,6 @@
 import { api } from '../api.js';
 import { getState, setState } from '../state.js';
 import { navigateTo } from '../router.js';
-import { renderHeader } from '../components/header.js';
 import { showModal, showAlert } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { logout } from '../auth.js';
@@ -20,16 +19,20 @@ export const profilePage = async () => {
         const profile = await api.getProfile();
         
         // ⭐ state에 저장 (헤더가 최신 정보 사용하도록)
+        /*
         setState({ 
             user: profile.nickname,
             profileImage: profile.profileImage || null
         });
-        
-        // 헤더 렌더링
-        renderHeader();
+        */
         
         content.innerHTML = `
             <div class="container">
+                <button class="back-btn" id="backBtn">  
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
                 <div class="profile-container">
                     <h2 style="text-align: center; margin-bottom: 2rem;">회원정보수정</h2>
                     
@@ -109,6 +112,9 @@ export const profilePage = async () => {
         
         setupValidation(profile.nickname);
         setupProfileHandlers(profile);
+        document.getElementById('backBtn')?.addEventListener('click', () => {
+            window.history.back();
+        });
         
     } catch (error) {
         content.innerHTML = `
@@ -340,12 +346,22 @@ function setupProfileHandlers(profile) {
             submitBtn.textContent = '수정 중...';
             
             const response = await api.updateProfile(formData);
-            
-            // 상태 업데이트
+            /*
+            // 상태 업데이트 (추후 수정)
             setState({ 
                 user: response.nickname,
                 profileImage: response.profileImage || null
             });
+            */
+            // 프로필 정보 가져오기
+            const profile = await api.getProfile();
+        
+            // state에 저장 (헤더가 최신 정보 사용하도록)
+            setState({ 
+                user: profile.nickname,
+                profileImage: profile.profileImage || null
+            });
+            
             
             // ⭐ 토스트 메시지 표시
             showToast('수정완료');
