@@ -1,11 +1,9 @@
 import { api } from '../api.js';
 import { navigateTo } from '../router.js';
 import { isLoggedIn } from '../auth.js';
-import { renderHeader } from '../components/header.js';
 
 // 새 게시글 작성
 export const postNewPage = async () => {
-    renderHeader({ showBackButton: true });
     renderPostForm();
 };
 
@@ -41,7 +39,15 @@ function renderPostForm(post = null) {
     content.innerHTML = `
         <div class="container">
             <div style="max-width: 800px;">
-                <h2 style="text-align: center">${isEdit ? '게시글 수정' : '게시글 작성'}</h2>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                    <button class="back-btn" id="backBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </button>
+                    <h2 style="text-align: center">${isEdit ? '게시글 수정' : '게시글 작성'}</h2>
+                    <div style="width: 40px"></div>
+                </div>
                 <form id="postForm">
                     <div class="form-group">
                         <label for="title"><b>제목*</b></label>
@@ -88,11 +94,11 @@ function renderPostForm(post = null) {
                         <button 
                             type="submit" 
                             id="submitBtn"
-                            class="btn btn-basic" 
-                            style="width: 80%;"
+                            class="btn btn-primary" 
+                            style="width: max-content"
                             disabled
                         >      
-                            ${isEdit ? '수정하기' : '완료'}
+                            ${isEdit ? '수정완료 🖋️' : '작성완료 🖋️'}
                         </button>
                     </div>
                 </form>
@@ -154,6 +160,10 @@ function renderPostForm(post = null) {
     
     titleInput.addEventListener('input', clearError);
     contentInput.addEventListener('input', clearError);
+
+    document.getElementById('backBtn')?.addEventListener('click', () => {
+        window.history.back();
+    });
 }
 
 function setupValidation() {
@@ -249,7 +259,6 @@ function validateInput(input) {
 // ⭐ Helper text 에러 표시 함수
 function showError(message) {
     const helperText = document.getElementById('formHelperText');
-    console.log(helperText);
     if (helperText) {
         helperText.textContent = message;
         helperText.classList.add('error');
@@ -257,7 +266,6 @@ function showError(message) {
 }
 function clearError() {
     const helperText = document.getElementById('formHelperText');
-    console.log(helperText);
     if (helperText) {
         helperText.textContent = '';
         helperText.classList.remove('error');

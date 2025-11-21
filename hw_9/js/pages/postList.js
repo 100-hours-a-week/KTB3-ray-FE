@@ -1,7 +1,6 @@
 import { api } from '../api.js';
 import { navigateTo } from '../router.js';
 import { isLoggedIn } from '../auth.js';
-import { renderHeader } from '../components/header.js';
 import {formatDateTime, formatNumber} from '../fromatter.js';
 
 export const postListPage = async () => {
@@ -14,7 +13,6 @@ export const postListPage = async () => {
         </div>
     `;
     
-    renderHeader();
     try {
         // API에서 게시글 목록 가져오기
         const posts = await api.getPosts();
@@ -23,11 +21,13 @@ export const postListPage = async () => {
         if (!posts || posts.length === 0) {
             content.innerHTML = `
                 <div class="container">
-                    <div class="card" style="text-align: center; padding: 3rem;">
-                        <h2>아직 게시글이 없습니다</h2>
-                        <p style="color: #666; margin: 1rem 0;">첫 번째 게시글을 작성해보세요!</p>
-                        ${isLoggedIn() ? '<a href="/posts/new" data-link class="btn btn-primary">첫 게시글 작성하기</a>' : '<a href="/login" data-link class="btn btn-primary">로그인하고 글쓰기</a>'}
+                    <div style="align-items: center; margin-bottom: 2rem; margin-top: 0.5rem">
+                        <div style="display: flex; justify-content: space-between">
+                            <a href="/posts/new" data-link class="btn btn-post" style="width: 100%; text-align: center;">오늘의 Node 작성하러가기 🖋️</a>
+                        </div>
+                        <p style="color: #2c2c2cff; margin: 1rem 0; text-align:center">아직 게시글이 없습니다</p>
                     </div>
+                        
                 </div>
             `;
             return;
@@ -36,11 +36,9 @@ export const postListPage = async () => {
         // 게시글 목록 렌더링
         content.innerHTML = `
             <div class="container">
-                <div style="align-items: center; margin-bottom: 2rem;">
-                    <div style="text-align: center; font-size:30px; font-weight:lighter;">안녕하세요,</div>
-                    <div style="text-align: center; font-size:30px; font-weight:lighter;">아무 말 대잔치 <strong>게시판</strong> 입니다.</div>
-                    <div style="display: flex; flex-direction: row-reverse">
-                        <a href="/posts/new" data-link class="btn btn-primary" style="width: 150px; text-align: center;">게시글 작성</a>
+                <div style="align-items: center; margin-bottom: 2rem; margin-top: 0.5rem">
+                    <div style="display: flex; justify-content: space-between">
+                        <a href="/posts/new" data-link class="btn btn-post" style="width: 100%; text-align: center;">오늘의 Node 작성하러가기 🖋️</a>
                     </div>
                 </div>
                 
@@ -75,31 +73,38 @@ function createPostCard(post) {
     
     return `
         <div class="card post-card" data-post-id="${post.postId}">
-            <div style="padding: 1.5rem">
-                <h2 class="post-title">${escapeHtml(title)}</h2>
-                <div style="display: flex; justify-content: space-between">
-                    <p class="post-meta">
-                        좋아요 ${escapeHtml(formatNumber(post.likeCount))}&nbsp;&nbsp;
-                        댓글 ${escapeHtml(formatNumber(post.commentCount))}&nbsp;&nbsp;
-                        조회수 ${escapeHtml(formatNumber(post.viewCount))}
-                    </p>
-                    <p class="post-meta">${escapeHtml(formattedDate)}</p>
-                
-                </div>
-            </div>
-            <div style="border: 0.5px solid #c9c9c9ff"></div>
-            <div style="padding: 1rem">
+            <div style="padding: 1.5rem 1rem 1rem 1rem">
                 <div style="display: flex; align-items: center">
                     ${post.authorProfileImg ? `
+                        
                         <img src="${post.authorProfileImg}" alt="프로필" class="profile-image">
                     ` : `
-                        <div class="profile-image no-image"></div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="20" fill="#2b2b2b"/>
+                            <circle cx="20.197" cy="11.9212" r="6.00985" fill="white"/>
+                            <path d="M31.5271 32.0197C31.5271 30.48 31.2315 28.9555 30.6571 27.533C30.0828 26.1106 29.241 24.8181 28.1797 23.7295C27.1185 22.6408 25.8586 21.7772 24.472 21.188C23.0854 20.5988 21.5993 20.2955 20.0985 20.2955C18.5977 20.2955 17.1115 20.5988 15.725 21.188C14.3384 21.7772 13.0785 22.6408 12.0173 23.7295C10.956 24.8181 10.1142 26.1106 9.53987 27.533C8.96553 28.9555 8.66992 30.48 8.66992 32.0197L20 32L31.5271 32.0197Z" fill="white"/>
+                        </svg>
                     `}
                     <p>
                         <strong>&nbsp;&nbsp;&nbsp;${escapeHtml(post.author || '익명')}</strong>
                     </p>
                 </div>
             </div>
+            <div style="padding: 0rem 1.5rem 1.5rem 1.5rem">
+                <h2 class="post-title">${escapeHtml(title)}</h2>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center" class="post-meta">
+                        <button class="heart" style="border: none" id="newLikeBtn" ></button>
+                        <p id="newLikeCount" style="margin-left: 5px; font-size: 15px;">${escapeHtml(formatNumber(post.likeCount))}</p>
+                        <button class="comment" style="border: none; margin-left: 20px"></button>
+                        <p style="margin-left: 5px; font-size: 15px;">${escapeHtml(formatNumber(post.commentCount))}</p>
+                        <button class="view" style="border: none; margin-left: 20px"></button>
+                        <p style="margin-left: 5px; font-size: 15px;">${escapeHtml(formatNumber(post.viewCount))}</p>
+
+                    </div>
+                    <p class="post-meta">${formatDateTime(formattedDate)}</p>
+                </div>          
+            </div>            
         </div>
     `;
 }

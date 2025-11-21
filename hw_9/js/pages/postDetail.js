@@ -2,14 +2,11 @@ import { api } from '../api.js';
 import { navigateTo } from '../router.js';
 import { getState } from '../state.js';
 import { isLoggedIn } from '../auth.js';
-import { renderHeader } from '../components/header.js';
 import { formatDateTime, formatNumber } from '../fromatter.js';
 import { showModal, showAlert } from '../components/modal.js';  // ⭐ 추가
 
 export const postDetailPage = async ({ id }) => {
     const content = document.getElementById('content');
-
-    renderHeader({ showBackButton: true });
     
     content.innerHTML = `
         <div class="container">
@@ -26,36 +23,43 @@ export const postDetailPage = async ({ id }) => {
         const { user } = getState();
         const isAuthor = post.postDetails.mine;
         let isLiked = post.postDetails.postLiked;
-        
         content.innerHTML = `
             <div class="container">
-                <div>
-                    <!-- 게시글 헤더 -->
-                    <div style="margin-left:30px; margin-right:30px">
-                        <h1>${escapeHtml(post.postSummary.title)}</h1>
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                            <div style="display: flex; align-items: center;">
-                                ${post.postSummary.authorProfileImg ? `
-                                    <img src="${post.postSummary.authorProfileImg}" alt="프로필" class="profile-image">
-                                ` : `
-                                    <div class="profile-image no-image"></div>
-                                `}
-                                <strong>&nbsp;&nbsp;&nbsp;${escapeHtml(post.postSummary.author || '익명')}</strong>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${formatDateTime(post.postSummary.postedTime)}
-                            </div>
-                            
-                            ${isAuthor ? `
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <button class="btn btn-form" id="editBtn">수정</button>
-                                    <button class="btn btn-form" id="deleteBtn">삭제</button>
-                                </div>
-                            ` : ''}
-                        </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 0px 10px 10px10px">
+                    <button class="back-btn" id="backBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </button>
+                    <div style="display: flex; align-items: center; margin: auto; font-size: 20px">
+                        ${post.postSummary.authorProfileImg ? `
+                            <img src="${post.postSummary.authorProfileImg}" alt="프로필" class="profile-image">
+                        ` : `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                <rect width="40" height="40" rx="20" fill="#2b2b2b"/>
+                                <circle cx="20.197" cy="11.9212" r="6.00985" fill="white"/>
+                                <path d="M31.5271 32.0197C31.5271 30.48 31.2315 28.9555 30.6571 27.533C30.0828 26.1106 29.241 24.8181 28.1797 23.7295C27.1185 22.6408 25.8586 21.7772 24.472 21.188C23.0854 20.5988 21.5993 20.2955 20.0985 20.2955C18.5977 20.2955 17.1115 20.5988 15.725 21.188C14.3384 21.7772 13.0785 22.6408 12.0173 23.7295C10.956 24.8181 10.1142 26.1106 9.53987 27.533C8.96553 28.9555 8.66992 30.48 8.66992 32.0197L20 32L31.5271 32.0197Z" fill="white"/>
+                            </svg>
+                        `}
+                        <strong>&nbsp;&nbsp;&nbsp;${escapeHtml(post.postSummary.author || '익명')}</strong>
                     </div>
-                    <!-- 구분선 -->
-                    <div style="border: 0.5px solid #c9c9c9ff"></div>
+                    <div style="width: 40px;"></div>
+                </div>
+                <!-- 구분선 -->
+                <div style="border: 0.5px solid #c9c9c9ff; margin: 20px 0px 10px 0px;"></div>
+                <!-- 게시글 -->
+                <div class="non-post-card" style="margin-top: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">                            
+                        <h1>${escapeHtml(post.postSummary.title)}</h1>
+                        ${isAuthor ? `
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn btn-form" id="editBtn">수정</button>
+                                <button class="btn btn-form" id="deleteBtn">삭제</button>
+                            </div>
+                        ` : ''}
+                    </div>
                     <!-- 게시글 내용 -->
-                    <div style="margin-left:30px; margin-right:30px">
+                    <div style="padding-bottom: 30px">
                         ${post.postDetails.imgUrl ? `
                             <img src="${post.postDetails.imgUrl}" style="width: 600px; padding-top: 20px">
                         ` : ""}
@@ -63,55 +67,49 @@ export const postDetailPage = async ({ id }) => {
                             ${escapeHtml(post.postDetails.content)}
                         </div>
                     </div>
+                    <!-- 좋아요, 조회수, 댓글 -->
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center" class="post-meta">
+                            <button class="heart ${isLiked ? 'liked' : ''}" style="border: none" id="newLikeBtn" ></button>
+                            <p id="newLikeCount" style="margin-left: 5px; font-size: 15px;">${escapeHtml(formatNumber(post.postSummary.likeCount))}</p>
+                            <button class="comment" style="border: none; margin-left: 20px"></button>
+                            <p id="commentCount" style="margin-left: 5px; font-size: 15px;">${escapeHtml(formatNumber(post.postSummary.commentCount))}</p>
+                            <button class="view" style="border: none; margin-left: 20px"></button>
+                            <p style="margin-left: 5px; font-size: 15px;">${escapeHtml(formatNumber(post.postSummary.viewCount))}</p>
+
+                        </div>
+                        <p class="post-meta">${formatDateTime(post.postSummary.postedTime)}</p>
+                    </div>           
                 </div>
-                <!-- 좋아요, 조회수, 댓글 -->
-                <div style="display: flex; justify-content: center">
-                    <button class="gray-box ${isLiked ? 'liked' : ''}" id="likeBtn">
-                        <h3 id='likeCount'>${formatNumber(post.postSummary.likeCount)}</h3>
-                        <h3>좋아요수</h3>
-                    </button>
-                    <button class="gray-box">
-                        <h3>${formatNumber(post.postSummary.viewCount)}</h3>
-                        <h3>조회수</h3>
-                    </button>
-                    <button class="gray-box">
-                        <h3>${formatNumber(post.postSummary.commentCount)}</h3>
-                        <h3>댓글</h3>
-                    </button>
-                </div>
-                <!-- 구분선 -->
-                <div style="border: 0.5px solid #c9c9c9ff"></div>
                 <!-- 댓글 작성 -->
-                <div class="card comment-card">
-                    <form id="commentForm">
-                        <div style="padding: 1.5rem 1.5rem 0rem 1.5rem; margin-top: 30px">
-                            <div class="form-group">
-                                <textarea 
-                                    name="content" 
-                                    placeholder="댓글을 남겨주세요!"
-                                    rows="3"
-                                    required
-                                ></textarea>
-                            </div>
+                <div class="round-card" style="margin-top: 25px">
+                    <form id="commentForm" style="display: flex; align-items: center; justify-content: space-between">
+                        <div class="form-group">
+                            <textarea 
+                                name="content" 
+                                placeholder="댓글을 남겨주세요!"
+                                rows="3"
+                                required
+                                style="width: 550px; height: 48px"
+                            ></textarea>
                         </div>
-                        <div style="border: 0.5px solid #c9c9c9ff"></div>
-                        <div style="display: flex; flex-direction: row-reverse; padding: 10px;">
-                            <button type="submit" class="btn btn-primary">댓글 등록</button>
-                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <p>🖋️</p>
+                        </button>
                     </form>
                 </div>
 
                 <!-- 댓글 목록 -->
                 <div id="commentsList">
                     ${comments.length > 0 ? 
-                        comments.map(comment => createCommentHTML(comment, user)).join('') :
-                        '<p style="color: #666; padding: 2rem 0; text-align: center;">첫 댓글을 작성해보세요!</p>'
+                        comments.map(comment => createCommentHTML(comment)).join('') :
+                        '<p id="no-comment" style="color: #666; padding: 2rem 0; text-align: center;">첫 댓글을 작성해보세요!</p>'
                     }
                 </div>
             </div>
         `;
         
-        setupEventListeners(post, user, isLiked);
+        setupEventListeners(post, isLiked);
         
     } catch (error) {
         content.innerHTML = `
@@ -123,14 +121,17 @@ export const postDetailPage = async ({ id }) => {
             </div>
         `;
     }
+    
 };
 
 // 댓글 HTML 생성
-function createCommentHTML(comment, currentUser) {
+function createCommentHTML(comment) {
     const isAuthor = comment.mine;
     
     return `
         <div class="comment-item" data-comment-id="${comment.commentId}">
+            <!-- 구분선 -->
+            <div style="border: 0.5px solid #c9c9c9ff; margin-top: 20px"></div>
             <div style="margin: 0px 30px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top:30px">
                     <div style="flex: 1;">
@@ -138,7 +139,11 @@ function createCommentHTML(comment, currentUser) {
                             ${comment.authorProfileImg ? `
                                 <img src="${comment.authorProfileImg}" alt="프로필" class="profile-image">
                             ` : `
-                                <div class="profile-image no-image"></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+                                    <rect width="40" height="40" rx="20" fill="#2b2b2b"/>
+                                    <circle cx="20.197" cy="11.9212" r="6.00985" fill="white"/>
+                                    <path d="M31.5271 32.0197C31.5271 30.48 31.2315 28.9555 30.6571 27.533C30.0828 26.1106 29.241 24.8181 28.1797 23.7295C27.1185 22.6408 25.8586 21.7772 24.472 21.188C23.0854 20.5988 21.5993 20.2955 20.0985 20.2955C18.5977 20.2955 17.1115 20.5988 15.725 21.188C14.3384 21.7772 13.0785 22.6408 12.0173 23.7295C10.956 24.8181 10.1142 26.1106 9.53987 27.533C8.96553 28.9555 8.66992 30.48 8.66992 32.0197L20 32L31.5271 32.0197Z" fill="white"/>
+                                </svg>
                             `}
                             <strong>&nbsp;&nbsp;&nbsp;${escapeHtml(comment.author || '익명')}</strong>
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${formatDateTime(comment.postedTime)}
@@ -157,12 +162,16 @@ function createCommentHTML(comment, currentUser) {
                     ` : ''}
                 </div>
             </div>
+            
         </div>
     `;
 }
 
 // 이벤트 리스너 설정
-function setupEventListeners(post, user, isLiked) {
+function setupEventListeners(post, isLiked) {
+    document.getElementById('backBtn')?.addEventListener('click', () => {
+        window.history.back();
+    });
     // 수정
     document.getElementById('editBtn')?.addEventListener('click', () => {
         navigateTo(`/posts/${post.postSummary.postId}/edit`);
@@ -194,27 +203,33 @@ function setupEventListeners(post, user, isLiked) {
     });
 
     // 좋아요 버튼
-    document.getElementById('likeBtn')?.addEventListener('click', async () => {
-        const likeBtn = document.getElementById('likeBtn');
-        const likeCountEl = document.getElementById('likeCount');
+    document.getElementById('newLikeBtn')?.addEventListener('click', async () => {
+        const likeBtn = document.getElementById('newLikeBtn');
+        const likeCountEl = document.getElementById('newLikeCount');
+
         let currentCount = post.postSummary.likeCount;
-        
-        isLiked = !isLiked;
-        
-        if (isLiked) {
-            likeBtn.classList.add('liked');
-            currentCount++;
-            likeCountEl.textContent = formatNumber(currentCount);
-            await api.likePost(post.postSummary.postId);
-        } else {
-            likeBtn.classList.remove('liked');
-            currentCount--;
-            likeCountEl.textContent = formatNumber(currentCount);
-            await api.unlikePost(post.postSummary.postId);
+        try {
+            if (!isLiked) {
+                await api.likePost(post.postSummary.postId);
+                isLiked = !isLiked;
+                likeBtn.classList.add('liked');
+                currentCount++;
+                likeCountEl.textContent = formatNumber(currentCount);
+            } else {
+                await api.unlikePost(post.postSummary.postId);
+                isLiked = !isLiked;
+                likeBtn.classList.remove('liked');
+                currentCount--;
+                likeCountEl.textContent = formatNumber(currentCount);
+            }
+            post.postSummary.likeCount = currentCount;
+        } catch (error) {
+            showAlert({
+                title: '좋아요 작업 실패',
+                message: error.message
+            });
         }
-        
-        post.postSummary.likeCount = currentCount;
-    });
+    })
     
     // 댓글 작성
     document.getElementById('commentForm')?.addEventListener('submit', async (event) => {
@@ -230,23 +245,23 @@ function setupEventListeners(post, user, isLiked) {
             });
             return;
         }
-        
+        const submitBtn = event.target.querySelector('button[type="submit"]');
         try {
-            const submitBtn = event.target.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
-            submitBtn.textContent = '작성 중...';
-            
-            await api.createComment(post.postSummary.postId, content);
-            
-            postDetailPage({ id: post.postSummary.postId });
+            const newComment = await api.createComment(post.postSummary.postId, content);
+            document.getElementById('commentsList').insertAdjacentHTML('beforeend' ,createCommentHTML(newComment));
+            event.target.reset();
+            const changeComment = document.getElementById("commentCount");
+            changeComment.textContent = formatNumber(post.postSummary.commentCount + 1);
+            document.getElementById('no-comment')?.remove();
+            post.postSummary.commentCount = post.postSummary.commentCount +1;
         } catch (error) {
             showAlert({
                 title: '작성 실패',
                 message: error.message
-            });
-            const submitBtn = event.target.querySelector('button[type="submit"]');
+            });            
+        } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = '댓글 작성';
         }
     });
     
@@ -255,6 +270,9 @@ function setupEventListeners(post, user, isLiked) {
         const commentId = event.target.dataset.commentId;
         if (!commentId) return;
         
+        const commentItem = event.target.closest('.comment-item');
+        const contentDiv = commentItem.querySelector('.comment-content');
+
         // 댓글 삭제
         if (event.target.classList.contains('comment-delete-btn')) {
             showModal({
@@ -265,7 +283,14 @@ function setupEventListeners(post, user, isLiked) {
                 onConfirm: async () => {
                     try {
                         await api.deleteComment(post.postSummary.postId, commentId);
-                        postDetailPage({ id: post.postSummary.postId });
+                        commentItem.remove();
+                        const changeComment = document.getElementById("commentCount");
+                        changeComment.textContent = formatNumber(post.postSummary.commentCount -1);
+                        const commentsList = document.getElementById('commentsList');
+                        if (commentsList.children.length === 0) {
+                            commentsList.innerHTML = '<p id="no-comment" style="color: #666; padding: 2rem 0; text-align: center;">첫 댓글을 작성해보세요!</p>';
+                        }
+                        post.postSummary.commentCount = post.postSummary.commentCount -1;
                     } catch (error) {
                         showAlert({
                             title: '삭제 실패',
@@ -274,14 +299,16 @@ function setupEventListeners(post, user, isLiked) {
                     }
                 }
             });
+            return;
         }
         
-        // ⭐ 댓글 수정
+        // 여기서부터 수정 시작
+
+        // 댓글 수정
         if (event.target.classList.contains('comment-edit-btn')) {
-            const commentItem = event.target.closest('.comment-item');
-            const contentDiv = commentItem.querySelector('.comment-content');
             const currentContent = contentDiv.querySelector('p').textContent.trim();
-            
+            // 원래 내용 저장
+            commentItem.dataset.originalContent = currentContent;
             // 수정 폼으로 변경
             contentDiv.innerHTML = `
                 <div class="comment-edit-form" style="display: flex; align-items: flex-start">
@@ -293,18 +320,30 @@ function setupEventListeners(post, user, isLiked) {
             
             // 수정 버튼 숨기기
             event.target.style.display = 'none';
+            return;
         }
         
         // 수정 취소
         if (event.target.classList.contains('comment-edit-cancel')) {
-            postDetailPage({ id: post.postSummary.postId });
+            const originalContent = commentItem.dataset.originalContent;
+            contentDiv.innerHTML = `
+                <p style="white-space: pre-line;">
+                    ${escapeHtml(originalContent)}
+                </p>
+            `
+            const editBtn = commentItem.querySelector('.comment-edit-btn');
+            if (editBtn) {
+                editBtn.style.display = 'block';
+            }
+
+            return;
         }
         
         // 수정 저장
         if (event.target.classList.contains('comment-edit-save')) {
             const textarea = document.getElementById(`editCommentText-${commentId}`);
             const newContent = textarea.value.trim();
-            
+            let originalContent = commentItem.dataset.originalContent;
             if (!newContent) {
                 showAlert({
                     title: '입력 오류',
@@ -315,18 +354,29 @@ function setupEventListeners(post, user, isLiked) {
             
             try {
                 event.target.disabled = true;
-                event.target.textContent = '저장 중...';
+
+                if (newContent !== originalContent) {
+                    // 내용 바뀌었을때만 api 호출
+                    await api.updateComment(post.postSummary.postId, commentId, newContent);
+                    originalContent = newContent;
+                }
                 
-                await api.updateComment(post.postSummary.postId, commentId, newContent);
-                
-                postDetailPage({ id: post.postSummary.postId });
             } catch (error) {
                 showAlert({
                     title: '수정 실패',
                     message: error.message
                 });
+            } finally {
+                contentDiv.innerHTML = `
+                    <p style="white-space: pre-line;">
+                        ${escapeHtml(originalContent)}
+                    </p>
+                `
                 event.target.disabled = false;
-                event.target.textContent = '저장';
+                const editBtn = commentItem.querySelector('.comment-edit-btn');
+                if (editBtn) {
+                    editBtn.style.display = 'block';
+                }
             }
         }
     });

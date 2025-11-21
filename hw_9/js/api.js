@@ -127,8 +127,9 @@ export const api = {
         body: formData
     }),
 
-    updatePassword: (formData) => request(`/users/password?password=${formData}`, {
-        method: 'PATCH'
+    updatePassword: (password) => request(`/users/password`, {
+        method: 'PATCH',
+        body: { password }
     }),
 
     getProfile: () => request(`/users/my-profile`),

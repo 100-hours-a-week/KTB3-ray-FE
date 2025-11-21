@@ -1,7 +1,6 @@
 import { api } from '../api.js';
 import { getState, setState } from '../state.js';
 import { navigateTo } from '../router.js';
-import { renderHeader } from '../components/header.js';
 import { showModal, showAlert } from '../components/modal.js';
 import { showToast } from '../components/toast.js';
 import { logout } from '../auth.js';
@@ -19,18 +18,15 @@ export const passwordEditPage = async () => {
         // 프로필 정보 가져오기
         const profile = await api.getProfile();
         
-        // ⭐ state에 저장 (헤더가 최신 정보를 사용하도록)
-        setState({ 
-            user: profile.nickname,
-            profileImage: profile.profileImage || null
-        });
-        
-        // 헤더 렌더링
-        renderHeader();
-        
         content.innerHTML = `
             <div class="container">
+                <button class="back-btn" id="backBtn">  
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
                 <div class="profile-container">
+                    
                     <h2 style="text-align: center; margin-bottom: 2rem;">비밀번호 수정</h2>
                     
                     <form id="passwordForm" novalidate>
@@ -85,6 +81,9 @@ export const passwordEditPage = async () => {
         
         setupValidation();
         setupFormHandler();
+        document.getElementById('backBtn')?.addEventListener('click', () => {
+            window.history.back();
+        });
         
     } catch (error) {
         content.innerHTML = `
@@ -235,8 +234,8 @@ function setupFormHandler() {
         event.preventDefault();
         
         const formData = new FormData(event.target);
-        const password = formData.get('password');
-        const confirmPassword = formData.get('confirmPassword');
+        const password = formData.get('password').trim();
+        const confirmPassword = formData.get('confirmPassword').trim();
         
         // 최종 검증
         const inputs = form.querySelectorAll('input[required]');
@@ -263,12 +262,6 @@ function setupFormHandler() {
             submitBtn.textContent = '수정 중...';
             
             const response = await api.updatePassword(password);
-            
-            // 상태 업데이트
-            setState({ 
-                user: response.nickname,
-                profileImage: response.profileImage || null
-            });
             
             // ⭐ 토스트 메시지 표시
             showToast('수정완료');

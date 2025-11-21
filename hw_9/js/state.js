@@ -14,6 +14,7 @@ export const getState = () => state;
 
 // 상태 업데이트
 export const setState = (updates) => {
+    console.log("setState 호출")
     // 상태 병합
     Object.assign(state, updates);
     

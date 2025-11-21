@@ -62,7 +62,12 @@ const initApp = async () => {
         alert('로그인이 필요합니다.');
         navigateTo('/login');
     }
-
+    document.addEventListener('click', (e) => {
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        if (dropdownMenu && !e.target.closest('.profile-menu')) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
     
     // 초기 라우팅
     await router();
